@@ -5,4 +5,4 @@ add_executable(path-tracer ${PATH_SRC})
 
 target_include_directories(path-tracer PRIVATE include)
 
-target_link_libraries(path-tracer PRIVATE common ray mat vec jsonlib asio)
+target_link_libraries(path-tracer PRIVATE commonlib raylib matlib veclib jsonlib asiolib)
