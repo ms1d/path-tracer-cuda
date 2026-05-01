@@ -10,7 +10,7 @@ foreach(src ${TEST_SOURCES})
         test_files/${test_name}.cu
     )
 
-	target_link_libraries(${test_name} PRIVATE common mat)
+	target_link_libraries(${test_name} PRIVATE commonlib matlib)
     add_test(NAME ${test_name} COMMAND ${test_name})
 
 endforeach()
