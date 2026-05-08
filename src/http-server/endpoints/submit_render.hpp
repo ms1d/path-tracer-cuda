@@ -15,32 +15,30 @@
 
 
 
-namespace keys {
-	constexpr auto render_id = "render_id";
-	constexpr auto ip = "ip";
-	constexpr auto port = "port";
-	constexpr auto width = "width";
-	constexpr auto height = "height";
-	constexpr auto samples = "samples";
-	constexpr auto pixels_to_skip = "pixels_to_skip";
-	constexpr auto mats = "mats";
-	constexpr auto camera = "camera";
-	constexpr auto fov = "fov";
-	constexpr auto pos = "pos";
-	constexpr auto rot = "rot";
-	constexpr auto scale = "scale";
-	constexpr auto emission = "emission";
-	constexpr auto smoothness = "smoothness";
-	constexpr auto metallic = "metallic";
-	constexpr auto rgb = "rgb";
-	constexpr auto objects = "objects";
-	constexpr auto mesh_id = "mesh_id";
-	constexpr auto mat_index = "mat_index";
-}
+#define RENDER_ID_KEY_NAME "render_id"
+#define IP_KEY_NAME "ip"
+#define PORT_KEY_NAME "port"
+#define WIDTH_KEY_NAME "width"
+#define HEIGHT_KEY_NAME "height"
+#define SAMPLES_KEY_NAME "samples"
+#define PIXELS_TO_SKIP_KEY_NAME "pixels_to_skip"
+#define MATS_KEY_NAME "mats"
+#define CAMERA_KEY_NAME "camera"
+#define FOV_KEY_NAME "fov"
+#define POS_KEY_NAME "pos"
+#define ROT_KEY_NAME "rot"
+#define SCALE_KEY_NAME "scale"
+#define EMISSION_KEY_NAME "emission"
+#define SMOOTHNESS_KEY_NAME "smoothness"
+#define METALLIC_KEY_NAME "metallic"
+#define RGB_KEY_NAME "rgb"
+#define OBJECTS_KEY_NAME "objects"
+#define MESH_ID_KEY_NAME "mesh_id"
+#define MAT_INDEX_KEY_NAME "mat_index"
 
 
 
-constexpr int number_of_keys_on_json_body = 12;
+#define TOTAL_KEYS 12
 
 
 
@@ -51,16 +49,16 @@ inline void enforce_string(const nlohmann::json &json, const std::string &key) {
 
 
 inline void enforce_valid_udp_details(const nlohmann::json &json) {
-	enforce_string(json, keys::ip); enforce_string(json, keys::port);
+	enforce_string(json, IP_KEY_NAME); enforce_string(json, PORT_KEY_NAME);
 
-	try { asio::ip::make_address(json[keys::ip].get<std::string>()); }
+	try { asio::ip::make_address(json[IP_KEY_NAME].get<std::string>()); }
 	catch (std::exception) {
-		auto msg = std::format("Valid {} (string) not found on JSON body", keys::ip);
+		auto msg = std::format("Valid {} (string) not found on JSON body", IP_KEY_NAME);
 		throw std::runtime_error(msg);
 	}
 
-	if (json[keys::port].get<std::string>().length() != 4) {
-		auto msg = std::format("Valid {} (string) of length 4 not found on JSON body", keys::port);
+	if (json[PORT_KEY_NAME].get<std::string>().length() != 4) {
+		auto msg = std::format("Valid {} (string) of length 4 not found on JSON body", PORT_KEY_NAME);
 		throw std::runtime_error(msg);
 	}
 }
@@ -81,10 +79,10 @@ inline void enforce_nonzero_uint16_t(const nlohmann::json &json, const std::stri
 
 // Depends on height and width having been validated
 inline void enforce_valid_pixels_to_skip(const nlohmann::json &json) {	
-	if (!json.contains(keys::pixels_to_skip)) return;
+	if (!json.contains(PIXELS_TO_SKIP_KEY_NAME)) return;
 	
-	auto msg_prefix = std::format("Valid {} (uint16_t[][]) not found on JSON body", keys::pixels_to_skip);
-	auto &pixels_to_skip = json[keys::pixels_to_skip];
+	auto msg_prefix = std::format("Valid {} (uint16_t[][]) not found on JSON body", PIXELS_TO_SKIP_KEY_NAME);
+	auto &pixels_to_skip = json[PIXELS_TO_SKIP_KEY_NAME];
 	if (!pixels_to_skip.is_array() || pixels_to_skip.size() == 0 || !pixels_to_skip[0].is_array()) {
 		auto msg = msg_prefix + ": could not find 2D array";
 		throw std::runtime_error(msg);
@@ -95,8 +93,8 @@ inline void enforce_valid_pixels_to_skip(const nlohmann::json &json) {
 		throw std::runtime_error(msg);
 	} 
 
-	auto height = json[keys::height].get<uint16_t>();
-    auto width = json[keys::width].get<uint16_t>();
+	auto height = json[HEIGHT_KEY_NAME].get<uint16_t>();
+    auto width = json[WIDTH_KEY_NAME].get<uint16_t>();
 
 	for (size_t i = 0; i < pixels_to_skip.size(); i++) {
 		if (pixels_to_skip[i].size() != 2) {
@@ -120,11 +118,11 @@ inline void enforce_valid_pixels_to_skip(const nlohmann::json &json) {
 
 
 inline void enforce_valid_camera(const nlohmann::json &json) {
-	auto& cam_json = json[keys::camera];
+	auto& cam_json = json[CAMERA_KEY_NAME];
 
 	try {
 		float pos[3], rot[3];
-		auto pos_json = cam_json[keys::pos], rot_json = cam_json[keys::rot];
+		auto pos_json = cam_json[POS_KEY_NAME], rot_json = cam_json[ROT_KEY_NAME];
 		if (!pos_json.is_array() || !rot_json.is_array() ||
 				pos_json.size() != 3 || rot_json.size() != 3) throw std::exception();
 
@@ -133,31 +131,31 @@ inline void enforce_valid_camera(const nlohmann::json &json) {
 		pos[2] = pos_json[2].get<float>(), rot[2] = rot_json[2].get<float>();
 	} catch (std::exception) {
 		auto msg = std::format("Valid {}['{}'] & {}['{}'] (float[3]) not found on JSON body",
-				keys::camera, keys::pos, keys::camera, keys::rot);
+				CAMERA_KEY_NAME, POS_KEY_NAME, CAMERA_KEY_NAME, ROT_KEY_NAME);
 		throw std::runtime_error(msg);
 	}
 	
 	try {
-		float fov = cam_json[keys::fov].get<float>();
+		float fov = cam_json[FOV_KEY_NAME].get<float>();
 		if (fov < 0 || fov > 180) throw std::exception();
 	} catch (std::exception) {
-		auto msg = std::format("Valid {}['{}'] (float) not found on JSON body", keys::camera, keys::fov);
+		auto msg = std::format("Valid {}['{}'] (float) not found on JSON body", CAMERA_KEY_NAME, FOV_KEY_NAME);
 		throw std::runtime_error(msg);
 	}
 }
 
 
 inline void enforce_valid_materials(const nlohmann::json &json) {
-	auto mats = json[keys::mats];
+	auto mats = json[MATS_KEY_NAME];
 
 	// Each object's mat_index is a uint8_t, allowing for only upto 256 materials to be used
 	if (mats.size() > 256) throw std::runtime_error("Too many materials in JSON body (max is 256)");
 
 	for (size_t i = 0; i < mats.size(); i++) {
-		auto &smoothness = mats[i][keys::smoothness],
-			 &metallic = mats[i][keys::metallic],
-			 &emission = mats[i][keys::emission],
-			 &rgb = mats[i][keys::rgb];
+		auto &smoothness = mats[i][SMOOTHNESS_KEY_NAME],
+			 &metallic = mats[i][METALLIC_KEY_NAME],
+			 &emission = mats[i][EMISSION_KEY_NAME],
+			 &rgb = mats[i][RGB_KEY_NAME];
 	
 		std::vector<nlohmann::json> v = {smoothness, metallic, emission};
 
@@ -179,30 +177,30 @@ inline void enforce_valid_materials(const nlohmann::json &json) {
 
 // Depends on materials already having been validated
 inline void enforce_valid_objects(const nlohmann::json &json) {
-	if (!json.contains(keys::objects)) throw std::runtime_error("Could not find objects key on JSON body.");
+	if (!json.contains(OBJECTS_KEY_NAME)) throw std::runtime_error("Could not find objects key on JSON body.");
 
-	auto &objs = json[keys::objects];
+	auto &objs = json[OBJECTS_KEY_NAME];
 	if (!objs.is_array()) throw std::runtime_error("objects was not array on JSON body.");
 	if (objs.size() == 0) throw std::runtime_error("objects array is empty.");
 
-	auto mats_len = json[keys::mats].size();
-	std::vector<const char*> pos_rot_scale = { keys::pos, keys::rot, keys::scale };
+	auto mats_len = json[MATS_KEY_NAME].size();
+	std::vector<const char*> pos_rot_scale = { POS_KEY_NAME, ROT_KEY_NAME, SCALE_KEY_NAME };
 	for (size_t i = 0; i < objs.size(); i++) {
 		auto &obj = objs[i];
 
 
-		if (!obj.contains(keys::mesh_id) || !obj[keys::mesh_id].is_string()) {
+		if (!obj.contains(MESH_ID_KEY_NAME) || !obj[MESH_ID_KEY_NAME].is_string()) {
 			auto msg = std::format("mesh_id (string) not found at objects[{}]", i);
 			throw std::runtime_error(msg);
 		}
 
-		std::fstream file(std::format("path-tracer/meshes/{}.mesh", obj[keys::mesh_id].get<std::string>()));
+		std::fstream file(std::format("path-tracer/meshes/{}.mesh", obj[MESH_ID_KEY_NAME].get<std::string>()));
 		if (!file) {
-			auto msg = std::format("Could not find mesh with id '{}' at objects[{}]", obj[keys::mesh_id].get<std::string>(), i);
+			auto msg = std::format("Could not find mesh with id '{}' at objects[{}]", obj[MESH_ID_KEY_NAME].get<std::string>(), i);
 			throw std::runtime_error(msg);
 		}
 		
-		if (!obj.contains(keys::mat_index) || obj[keys::mat_index].get<uint8_t>() >= mats_len) {
+		if (!obj.contains(MAT_INDEX_KEY_NAME) || obj[MAT_INDEX_KEY_NAME].get<uint8_t>() >= mats_len) {
 			auto msg = std::format("Valid mat_index not found at objects[{}]", i);
 			throw std::runtime_error(msg);
 		}
@@ -256,13 +254,13 @@ inline void submit_render(const httplib::Request& req, httplib::Response& res) {
 
 	// Assert data validity
 	try {
-		enforce_string(incoming_body, keys::render_id);
+		enforce_string(incoming_body, RENDER_ID_KEY_NAME);
 
 		enforce_valid_udp_details(incoming_body);
 		
-		enforce_nonzero_uint16_t(incoming_body, keys::width);
-		enforce_nonzero_uint16_t(incoming_body, keys::height);
-		enforce_nonzero_uint16_t(incoming_body, keys::samples);
+		enforce_nonzero_uint16_t(incoming_body, WIDTH_KEY_NAME);
+		enforce_nonzero_uint16_t(incoming_body, HEIGHT_KEY_NAME);
+		enforce_nonzero_uint16_t(incoming_body, SAMPLES_KEY_NAME);
 
 		enforce_valid_pixels_to_skip(incoming_body);
 
