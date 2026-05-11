@@ -12,7 +12,7 @@
 
 
 #include "structs.cuh"
-#include "vec.cuh"
+#include "vec3.cuh"
 #include <atomic>
 
 
