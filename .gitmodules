@@ -7,3 +7,15 @@
 [submodule "lib/common"]
 	path = lib/common
 	url = git@github.com:ms1d/common
+[submodule "lib/veclib"]
+	path = lib/veclib
+	url = git@github.com:ms1d/veclib
+[submodule "lib/matlib"]
+	path = lib/matlib
+	url = git@github.com:ms1d/matlib
+[submodule "lib/commonlib"]
+	path = lib/commonlib
+	url = git@github.com:ms1d/commonlib
+[submodule "commonlib"]
+	path = commonlib
+	url = git@github.com:ms1d/commonlib
